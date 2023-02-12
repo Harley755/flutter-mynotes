@@ -16,7 +16,6 @@ void main() {
         throwsA(const TypeMatcher<NotInitializedException>()),
       );
     });
-
     test('Should be able to be initialized', () async {
       await provider.initialize();
       expect(provider.isInitialized, true);
