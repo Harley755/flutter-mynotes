@@ -6,13 +6,32 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' show join;
 
-class NotesServices {
+class NotesService {
   Database? _db;
 
   List<DatabaseNote> _notes = [];
 
+  static final NotesService _shared = NotesService._sharedInstance();
+  NotesService._sharedInstance();
+
+  factory NotesService() => _shared;
+
   final _notesStreamController =
       StreamController<List<DatabaseNote>>.broadcast();
+
+  Stream<List<DatabaseNote>> get allNotes => _notesStreamController.stream;
+
+  Future<DatabaseUser> getOrCreateUser({required String email}) async {
+    try {
+      final user = await getUser(email: email);
+      return user;
+    } on CouldNotFindUser {
+      final createdUser = await createUser(email: email);
+      return createdUser;
+    } catch (e) {
+      rethrow;
+    }
+  }
 
   Future<void> _cacheNotes() async {
     final allNotes = await getAllNotes();
@@ -33,7 +52,11 @@ class NotesServices {
     if (updateCount == 0) {
       throw CouldNotUpdateNote();
     } else {
-      return await getNote(id: note.id);
+      final updatedNote = await getNote(id: note.id);
+      _notes.removeWhere((note) => note.id == updatedNote.id);
+      _notes.add(updatedNote);
+      _notesStreamController.add(_notes);
+      return updatedNote;
     }
   }
 
@@ -91,7 +114,7 @@ class NotesServices {
     final db = _getDatabaseOrThrow();
     final dbUser = await getUser(email: owner.email);
     if (dbUser != owner) {
-      throw CouldNotFoundUser();
+      throw CouldNotFindUser();
     }
 
     const text = '';
@@ -123,7 +146,7 @@ class NotesServices {
       whereArgs: [email.toLowerCase()],
     );
     if (results.isEmpty) {
-      throw CouldNotFoundUser();
+      throw CouldNotFindUser();
     } else {
       return DatabaseUser.fromRow(results.first);
     }
