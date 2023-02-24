@@ -64,6 +64,9 @@ class _LoginViewState extends State<LoginView> {
           padding: const EdgeInsets.all(16.0),
           child: Column(
             children: [
+              const Text(
+                'Please log in to account in order to interact with and create notes !!',
+              ),
               TextField(
                 keyboardType: TextInputType.emailAddress,
                 autofocus: true,

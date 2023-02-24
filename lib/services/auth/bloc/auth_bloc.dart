@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:bloc/bloc.dart';
 import 'package:mynotes/services/auth/auth_provider.dart';
 import 'package:mynotes/services/auth/bloc/auth_event.dart';
@@ -8,6 +6,10 @@ import 'package:mynotes/services/auth/bloc/auth_state.dart';
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   AuthBloc(AuthProvider provider)
       : super(const AuthStateUninitialized(isLoading: true)) {
+    on<AuthEventShouldRegister>((event, emit) {
+      emit(const AuthStateRegistering(exception: null, isLoading: false));
+    });
+
     // FORGOT PASSWORD
     on<AuthEventForgotPassword>((event, emit) async {
       emit(const AuthStateForgotPassword(
