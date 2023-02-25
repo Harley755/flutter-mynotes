@@ -49,6 +49,7 @@ class _ForgotPasswordViewState extends State<ForgotPasswordView> {
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Forgot password'),
+          centerTitle: true,
         ),
         body: Padding(
           padding: const EdgeInsets.all(8.0),
